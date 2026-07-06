@@ -1,0 +1,7 @@
+# Profile Enhancement Merge Template for Clash Verge
+
+profile:
+  store-selected: true
+
+prepend-rules:
+  - PROCESS-NAME,Claude Helper,🇺🇸 美国自动
