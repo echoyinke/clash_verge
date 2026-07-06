@@ -26,9 +26,10 @@ function main(config, profileName) {
   // --------------------------------------------------------------------------
   // 区域定义表：一张「区域 -> 如何识别 + 如何建组」的映射。
   //   name       ：要生成的组名
-  //   tolerance  ：url-test 容差(毫秒)。只有别的节点比当前节点快「超过」这个
-  //                值才切换，用来抑制来回横跳。美国跨太平洋抖动大，给 250；
-  //                亚洲近距离线路稳定，给 150。
+  //   tolerance  ：url-test 容差(毫秒)。切换规则是「当前节点延迟 − 本轮最快
+  //                节点延迟 > tolerance」才切走，否则维持现状，用来抑制相近
+  //                节点间的来回横跳。实测各区组内跨度普遍 < 50ms，这道门槛很少
+  //                被触发，统一给 100 即可（此前美国 250 无实测依据，已去掉）。
   //   patterns   ：一组正则，命中「任意一个」即认为该节点属于此区域。
   //                /.../i 表示忽略大小写；\s* 匹配 0~多个空格（兼容
   //                "United States" / "UnitedStates"）；\b 是单词边界，
@@ -36,12 +37,12 @@ function main(config, profileName) {
   // 想加/改区域，改这张表即可，下面的逻辑全自动适配。
   // --------------------------------------------------------------------------
   const regionDefs = [
-    { name: "🇭🇰 香港自动", tolerance: 150, patterns: [/香港/, /Hong\s*Kong/i, /\bHK\b/i] },
-    { name: "🇨🇳 台湾自动", tolerance: 150, patterns: [/台湾/, /Taiwan/i, /\bTW\b/i] },
-    { name: "🇸🇬 狮城自动", tolerance: 150, patterns: [/狮城/, /新加坡/, /Singapore/i, /\bSG\b/i] },
-    { name: "🇯🇵 日本自动", tolerance: 150, patterns: [/日本/, /Japan/i, /\bJP\b/i] },
-    { name: "🇺🇸 美国自动", tolerance: 250, patterns: [/美国/, /United\s*States/i, /\bUS\b/i, /\bUSA\b/i] },
-    { name: "🇲🇾 马来西亚自动", tolerance: 150, patterns: [/马来西亚/, /Malaysia/i, /\bMY\b/i] },
+    { name: "🇭🇰 香港自动", tolerance: 100, patterns: [/香港/, /Hong\s*Kong/i, /\bHK\b/i] },
+    { name: "🇨🇳 台湾自动", tolerance: 100, patterns: [/台湾/, /Taiwan/i, /\bTW\b/i] },
+    { name: "🇸🇬 狮城自动", tolerance: 100, patterns: [/狮城/, /新加坡/, /Singapore/i, /\bSG\b/i] },
+    { name: "🇯🇵 日本自动", tolerance: 100, patterns: [/日本/, /Japan/i, /\bJP\b/i] },
+    { name: "🇺🇸 美国自动", tolerance: 100, patterns: [/美国/, /United\s*States/i, /\bUS\b/i, /\bUSA\b/i] },
+    { name: "🇲🇾 马来西亚自动", tolerance: 100, patterns: [/马来西亚/, /Malaysia/i, /\bMY\b/i] },
   ];
 
   // 把节点对象数组映射成「节点名」字符串数组；filter(Boolean) 去掉空名字。
